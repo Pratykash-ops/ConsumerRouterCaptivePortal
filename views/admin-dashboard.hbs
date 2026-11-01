@@ -1,0 +1,1042 @@
+<!-- views/admin-dashboard.hbs -->
+<!-- Fullscreen Cyberpunk Multi-Page Admin Dashboard -->
+
+<div class="fullscreen-app">
+
+  <!-- ==================== LEFT CYBER SIDEBAR ==================== -->
+  <aside class="cyber-sidebar">
+    <!-- Brand / Gateway Identity -->
+    <div class="sidebar-brand">
+      <div class="brand-crest">
+        <span class="jp-crest">南</span>
+        <div class="crest-glow"></div>
+      </div>
+      <div class="brand-text">
+        <div class="brand-title display">MINAMI</div>
+        <div class="brand-sub mono">GATEWAY // OS v2.0</div>
+      </div>
+    </div>
+
+    <!-- Operator Status Card -->
+    <div class="sidebar-operator">
+      <div class="operator-avatar">
+        <i class="fa-solid fa-user-astronaut"></i>
+      </div>
+      <div class="operator-details">
+        <div class="operator-name mono">{{adminUser.username}}</div>
+        <div class="operator-role">
+          <span class="status-dot"></span>
+          <span class="mono">{{adminUser.role}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+      <div class="nav-section-title mono">CORE NAVIGATION // ナビ</div>
+      
+      <a href="/admin/dashboard?tab=overview" class="nav-link {{#if isTabOverview}}active{{/if}}">
+        <i class="fa-solid fa-gauge-high"></i>
+        <span>Overview</span>
+        <span class="nav-jp">総合</span>
+      </a>
+
+      <a href="/admin/dashboard?tab=sessions" class="nav-link {{#if isTabSessions}}active{{/if}}">
+        <i class="fa-solid fa-laptop-code"></i>
+        <span>Client Sessions</span>
+        <span class="nav-badge mono">{{stats.activeSessionsCount}}</span>
+      </a>
+
+      <a href="/admin/dashboard?tab=dns" class="nav-link {{#if isTabDns}}active{{/if}}">
+        <i class="fa-solid fa-satellite-dish"></i>
+        <span>DNS Interceptor</span>
+        <span class="nav-badge mono">{{stats.dnsLogsCount}}</span>
+      </a>
+
+      <a href="/admin/dashboard?tab=dhcp" class="nav-link {{#if isTabDhcp}}active{{/if}}">
+        <i class="fa-solid fa-server"></i>
+        <span>Integrated DHCP</span>
+        {{#if dhcpActive}}
+          <span class="nav-dot-active"></span>
+        {{/if}}
+      </a>
+
+      <a href="/admin/dashboard?tab=users" class="nav-link {{#if isTabUsers}}active{{/if}}">
+        <i class="fa-solid fa-users-gear"></i>
+        <span>User Accounts</span>
+        <span class="nav-badge mono">{{stats.usersCount}}</span>
+      </a>
+
+      <div class="nav-section-title mono" style="margin-top: 14px;">CONFIGURATION // 設定</div>
+
+      <a href="/admin/dashboard?tab=branding" class="nav-link {{#if isTabBranding}}active{{/if}}">
+        <i class="fa-solid fa-palette"></i>
+        <span>Portal Branding</span>
+        <span class="nav-jp">外観</span>
+      </a>
+
+      <a href="/admin/dashboard?tab=diagnostics" class="nav-link {{#if isTabDiagnostics}}active{{/if}}">
+        <i class="fa-solid fa-microchip"></i>
+        <span>Diagnostics & Router</span>
+        <span class="nav-jp">診断</span>
+      </a>
+
+      <a href="/admin/dashboard?tab=settings" class="nav-link {{#if isTabSettings}}active{{/if}}">
+        <i class="fa-solid fa-sliders"></i>
+        <span>System Settings</span>
+        <span class="nav-jp">設定</span>
+      </a>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <div class="footer-telemetry mono">
+        <div>SERVER IP: <span style="color: var(--neon-cyan);">{{detected_ip}}</span></div>
+        <div style="font-size: 10px; color: var(--text-dim);">UPSTREAM: GOOGLE DNS (8.8.8.8)</div>
+      </div>
+      <a href="/admin/logout" class="btn btn-danger btn-sm" style="width: 100%;">
+        <i class="fa-solid fa-power-off"></i>
+        <span>Disconnect</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT AREA ==================== -->
+  <main class="cyber-main">
+
+    <!-- Top Telemetry & Control Bar -->
+    <header class="cyber-topbar">
+      <div class="topbar-title">
+        <div class="view-tag display">
+          {{#if isTabOverview}}OVERVIEW // 総合監視{{/if}}
+          {{#if isTabSessions}}CLIENT SESSIONS // 接続端末管理{{/if}}
+          {{#if isTabDns}}DNS INTERCEPTOR // トラフィック監視{{/if}}
+          {{#if isTabDhcp}}INTEGRATED DHCP ENGINE // 割当管理{{/if}}
+          {{#if isTabUsers}}USER DIRECTORY // アカウント管理{{/if}}
+          {{#if isTabBranding}}PORTAL CUSTOMIZER // 外観設定{{/if}}
+          {{#if isTabDiagnostics}}PRE-FLIGHT DIAGNOSTICS // 診断{{/if}}
+          {{#if isTabSettings}}SYSTEM CONFIGURATION // 環境設定{{/if}}
+        </div>
+      </div>
+
+      <!-- Live Machine Telemetry -->
+      <div class="topbar-telemetry">
+        <div class="telemetry-pill">
+          <i class="fa-solid fa-microchip" style="color: var(--neon-cyan);"></i>
+          <span class="mono">LOAD: {{systemStats.loadAvg}}</span>
+        </div>
+        <div class="telemetry-pill">
+          <i class="fa-solid fa-memory" style="color: var(--neon-green);"></i>
+          <span class="mono">RAM: {{systemStats.memPercent}}% ({{systemStats.usedMemMb}}/{{systemStats.totalMemMb}}M)</span>
+        </div>
+        <div class="telemetry-pill">
+          <i class="fa-solid fa-clock" style="color: var(--neon-amber);"></i>
+          <span class="mono">UP: {{systemStats.systemUptime}}</span>
+        </div>
+        <a href="/portal/login" target="_blank" class="btn btn-secondary btn-sm" title="Preview Client Captive Portal">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>Portal View</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Notification Toasts / Banners -->
+    <div class="cyber-content-container">
+      {{#if saved}}
+        <div class="alert alert-success">
+          <i class="fa-solid fa-circle-check"></i>
+          <div><strong>Configuration Saved:</strong> System parameters and portal options updated successfully.</div>
+        </div>
+      {{/if}}
+
+      {{#if userCreated}}
+        <div class="alert alert-success">
+          <i class="fa-solid fa-user-plus"></i>
+          <div><strong>User Enrolled:</strong> Client credentials created successfully.</div>
+        </div>
+      {{/if}}
+
+      {{#if userDeleted}}
+        <div class="alert alert-info">
+          <i class="fa-solid fa-user-xmark"></i>
+          <div><strong>User Revoked:</strong> Account successfully removed from authentication database.</div>
+        </div>
+      {{/if}}
+
+      {{#if cleared}}
+        <div class="alert alert-info">
+          <i class="fa-solid fa-trash-can"></i>
+          <div><strong>DNS Stream Cleared:</strong> Query logs successfully wiped from memory and disk.</div>
+        </div>
+      {{/if}}
+
+      {{#if userError}}
+        <div class="alert alert-danger">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <div><strong>Operation Failed:</strong> {{userError}}</div>
+        </div>
+      {{/if}}
+
+      <!-- ==================== TAB 1: OVERVIEW ==================== -->
+      {{#if isTabOverview}}
+        <!-- Metric Grid -->
+        <div class="metric-grid">
+          <div class="cyber-metric-card">
+            <div class="metric-header">
+              <span class="metric-label mono">ACTIVE AUTHORIZED SESSIONS</span>
+              <i class="fa-solid fa-wifi" style="color: var(--neon-green);"></i>
+            </div>
+            <div class="metric-number display" style="color: var(--neon-green);">{{stats.activeSessionsCount}}</div>
+            <div class="metric-sub mono">{{stats.totalSessionsCount}} total recorded sessions</div>
+          </div>
+
+          <div class="cyber-metric-card">
+            <div class="metric-header">
+              <span class="metric-label mono">DNS HIJACKS (PORTAL WALL)</span>
+              <i class="fa-solid fa-shield-halved" style="color: var(--neon-pink);"></i>
+            </div>
+            <div class="metric-number display" style="color: var(--neon-pink);">{{stats.dnsStats.hijacked}}</div>
+            <div class="metric-sub mono">Unauthorized requests redirected</div>
+          </div>
+
+          <div class="cyber-metric-card">
+            <div class="metric-header">
+              <span class="metric-label mono">DNS RESOLVED (WAN INTERNET)</span>
+              <i class="fa-solid fa-globe" style="color: var(--neon-cyan);"></i>
+            </div>
+            <div class="metric-number display" style="color: var(--neon-cyan);">{{stats.dnsStats.resolved}}</div>
+            <div class="metric-sub mono">Upstream Google DNS passes</div>
+          </div>
+
+          <div class="cyber-metric-card">
+            <div class="metric-header">
+              <span class="metric-label mono">REGISTERED CLIENT ACCOUNTS</span>
+              <i class="fa-solid fa-users" style="color: var(--neon-purple);"></i>
+            </div>
+            <div class="metric-number display" style="color: var(--neon-purple);">{{stats.usersCount}}</div>
+            <div class="metric-sub mono">Persistent database credentials</div>
+          </div>
+        </div>
+
+        <!-- Overview Two-Column Deck -->
+        <div class="overview-grid" style="margin-top: 20px;">
+          <!-- Recent Sessions Mini-Feed -->
+          <div class="cyber-card">
+            <div class="card-title-bar">
+              <div class="card-title display"><i class="fa-solid fa-network-wired" style="color: var(--neon-green);"></i> Live Active Clients</div>
+              <a href="/admin/dashboard?tab=sessions" class="btn btn-secondary btn-sm">View All</a>
+            </div>
+            {{#if sessionsList.length}}
+              <div class="table-responsive">
+                <table class="cyber-table">
+                  <thead>
+                    <tr>
+                      <th>Client IP</th>
+                      <th>Account</th>
+                      <th>Expires In</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each sessionsList}}
+                      <tr>
+                        <td class="mono"><strong>{{this.ip_address}}</strong></td>
+                        <td>{{#if this.username}}<span class="mono">{{this.username}}</span>{{else}}<span style="color: var(--text-muted);">Guest</span>{{/if}}</td>
+                        <td class="mono" style="font-size: 11px;">{{this.expires_at}}</td>
+                        <td>
+                          {{#if this.isExpired}}
+                            <span class="badge badge-danger">Expired</span>
+                          {{else}}
+                            <span class="badge badge-success">Active</span>
+                          {{/if}}
+                        </td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            {{else}}
+              <div class="empty-state mono">No client devices currently authorized.</div>
+            {{/if}}
+          </div>
+
+          <!-- Gateway & Quick Action Deck -->
+          <div class="cyber-card">
+            <div class="card-title-bar">
+              <div class="card-title display"><i class="fa-solid fa-bolt" style="color: var(--neon-amber);"></i> Quick Gateway Controls</div>
+            </div>
+            <div class="quick-controls-list">
+              <form method="POST" action="/admin/branding/toggle" style="margin-bottom: 12px;">
+                <div class="control-row">
+                  <div>
+                    <div style="font-weight: 600; color: var(--text-main);">Enterprise Custom Wallpaper Branding</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Current: {{#if isEnterpriseBranding}}<span class="badge badge-success">Enabled</span>{{else}}<span class="badge badge-neutral">Disabled (Clean)</span>{{/if}}</div>
+                  </div>
+                  <button type="submit" class="btn btn-secondary btn-sm">Toggle Theme</button>
+                </div>
+              </form>
+
+              <form method="POST" action="/admin/clear-logs" style="margin-bottom: 12px;">
+                <div class="control-row">
+                  <div>
+                    <div style="font-weight: 600; color: var(--text-main);">Flush DNS Interception Buffer</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">{{stats.dnsLogsCount}} queries logged in memory buffer</div>
+                  </div>
+                  <button type="submit" class="btn btn-secondary btn-sm">Clear Buffer</button>
+                </div>
+              </form>
+
+              <div class="control-row">
+                <div>
+                  <div style="font-weight: 600; color: var(--text-main);">Integrated DHCP Engine</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">
+                    {{#if dhcpActive}}<span style="color: var(--neon-green);">&#9679; Listening on UDP 67</span>{{else}}<span style="color: var(--neon-amber);">&#9679; Standby (Run with sudo to bind)</span>{{/if}}
+                  </div>
+                </div>
+                <a href="/admin/dashboard?tab=dhcp" class="btn btn-secondary btn-sm">DHCP Details</a>
+              </div>
+            </div>
+
+            <!-- Server Bypass Interfaces List -->
+            <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--cyber-border);">
+              <div class="mono" style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">HOST ADAPTERS (WALL BYPASS ACTIVE):</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                {{#each serverBypassIps}}
+                  <span class="badge badge-neutral mono" style="font-size: 10px;">{{this}}</span>
+                {{/each}}
+              </div>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+
+      <!-- ==================== TAB 2: SESSIONS ==================== -->
+      {{#if isTabSessions}}
+        <div class="cyber-card">
+          <div class="card-title-bar">
+            <div class="card-title display"><i class="fa-solid fa-laptop-code" style="color: var(--neon-green);"></i> Authorized Client Sessions ({{sessionsList.length}})</div>
+          </div>
+
+          <!-- Direct Manual Authorize Device Form -->
+          <form method="POST" action="/admin/sessions/authorize" class="action-bar-form">
+            <div style="font-weight: 700; font-size: 12px; color: var(--neon-cyan); margin-bottom: 8px;">
+              <i class="fa-solid fa-plus-circle"></i> DIRECT MANUAL DEVICE AUTHORIZATION:
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <input type="text" name="ip_address" class="mono" placeholder="Client IP (e.g. 192.168.0.105)" required style="flex: 1; min-width: 200px; padding: 8px 12px; background: var(--cyber-panel); border: 1px solid var(--cyber-border); color: var(--text-main); border-radius: var(--radius-sm);">
+              <input type="number" name="hours" placeholder="Hours (e.g. 24)" value="24" min="1" max="720" style="width: 110px; padding: 8px 12px; background: var(--cyber-panel); border: 1px solid var(--cyber-border); color: var(--text-main); border-radius: var(--radius-sm);">
+              <button type="submit" class="btn btn-primary btn-sm">Authorize Device</button>
+            </div>
+          </form>
+
+          {{#if sessionsList.length}}
+            <div class="table-responsive" style="margin-top: 16px;">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th>Client IPv4</th>
+                    <th>User / Account</th>
+                    <th>Voucher / Ref</th>
+                    <th>Authorized At</th>
+                    <th>Expires At</th>
+                    <th>Status</th>
+                    <th style="text-align: center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each sessionsList}}
+                    <tr>
+                      <td class="mono"><strong>{{this.ip_address}}</strong></td>
+                      <td>{{#if this.username}}<span class="mono">{{this.username}}</span>{{else}}<span style="color: var(--text-muted);">Guest Client</span>{{/if}}</td>
+                      <td>{{#if this.reference_number}}{{this.reference_number}}{{else}}<span style="color: var(--text-muted);">-</span>{{/if}}</td>
+                      <td class="mono" style="color: var(--text-muted); font-size: 11px;">{{this.authorized_at}}</td>
+                      <td class="mono" style="font-size: 11px;">{{this.expires_at}}</td>
+                      <td>
+                        {{#if this.isExpired}}
+                          <span class="badge badge-danger">Expired</span>
+                        {{else}}
+                          <span class="badge badge-success">Active</span>
+                        {{/if}}
+                      </td>
+                      <td style="text-align: center;">
+                        <form method="POST" action="/admin/revoke-session" style="margin: 0;">
+                          <input type="hidden" name="ip_address" value="{{this.ip_address}}">
+                          <button type="submit" class="btn btn-danger btn-sm" style="padding: 4px 8px;">
+                            <i class="fa-solid fa-ban"></i>
+                            <span>Revoke</span>
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          {{else}}
+            <div class="empty-state mono">No client devices currently authorized on network.</div>
+          {{/if}}
+        </div>
+      {{/if}}
+
+      <!-- ==================== TAB 3: DNS INTERCEPTOR ==================== -->
+      {{#if isTabDns}}
+        <div class="cyber-card">
+          <div class="card-title-bar">
+            <div class="card-title display"><i class="fa-solid fa-satellite-dish" style="color: var(--neon-cyan);"></i> DNS Interceptor & Query Stream</div>
+            <div style="display: flex; gap: 8px;">
+              <span class="badge badge-cyan mono">{{dnsLogsList.length}} Displayed</span>
+              <form method="POST" action="/admin/clear-logs" style="margin: 0;">
+                <button type="submit" class="btn btn-danger btn-sm">Clear Logs</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- DNS Metrics Strip -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
+            <div style="background: var(--cyber-panel); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--cyber-border);">
+              <div class="mono" style="font-size: 10px; color: var(--text-muted);">TOTAL DNS QUERIES</div>
+              <div class="display" style="font-size: 18px; color: var(--text-main);">{{stats.dnsLogsCount}}</div>
+            </div>
+            <div style="background: var(--cyber-panel); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--cyber-border);">
+              <div class="mono" style="font-size: 10px; color: var(--neon-pink);">CAPTIVE HIJACKS</div>
+              <div class="display" style="font-size: 18px; color: var(--neon-pink);">{{stats.dnsStats.hijacked}}</div>
+            </div>
+            <div style="background: var(--cyber-panel); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--cyber-border);">
+              <div class="mono" style="font-size: 10px; color: var(--neon-cyan);">UPSTREAM RESOLVED</div>
+              <div class="display" style="font-size: 18px; color: var(--neon-cyan);">{{stats.dnsStats.resolved}}</div>
+            </div>
+            <div style="background: var(--cyber-panel); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--cyber-border);">
+              <div class="mono" style="font-size: 10px; color: var(--neon-amber);">RESOLUTION ERRORS</div>
+              <div class="display" style="font-size: 18px; color: var(--neon-amber);">{{stats.dnsStats.errors}}</div>
+            </div>
+          </div>
+
+          {{#if dnsLogsList.length}}
+            <div class="table-responsive">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Client IP</th>
+                    <th>Requested Domain</th>
+                    <th>Interceptor Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each dnsLogsList}}
+                    <tr>
+                      <td class="mono" style="font-size: 11px; color: var(--text-muted);">{{this.created_at}}</td>
+                      <td class="mono"><strong>{{this.client_ip}}</strong></td>
+                      <td class="mono" style="color: var(--neon-cyan);">{{this.domain}}</td>
+                      <td>
+                        {{#if this.isHijacked}}
+                          <span class="badge badge-danger">Hijacked &rarr; Portal</span>
+                        {{else if this.isResolved}}
+                          <span class="badge badge-success">Resolved &rarr; WAN</span>
+                        {{else if this.isServerBypass}}
+                          <span class="badge badge-neutral">Server Host Bypass</span>
+                        {{else if this.isRateLimited}}
+                          <span class="badge badge-warning">Rate-Limited</span>
+                        {{else}}
+                          <span class="badge badge-warning">Error / NXDOMAIN</span>
+                        {{/if}}
+                      </td>
+                    </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          {{else}}
+            <div class="empty-state mono">No DNS interception activity recorded yet.</div>
+          {{/if}}
+        </div>
+      {{/if}}
+
+      <!-- ==================== TAB 4: DHCP ENGINE ==================== -->
+      {{#if isTabDhcp}}
+        <div class="cyber-card">
+          <div class="card-title-bar">
+            <div class="card-title display"><i class="fa-solid fa-server" style="color: var(--neon-cyan);"></i> Integrated RFC 2131 / RFC 8910 DHCP Server</div>
+            <div>
+              {{#if dhcpActive}}
+                <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> UDP Port 67 Listening</span>
+              {{else}}
+                <span class="badge badge-warning"><i class="fa-solid fa-triangle-exclamation"></i> Standby (Run with sudo to bind)</span>
+              {{/if}}
+            </div>
+          </div>
+
+          <div class="alert alert-info" style="font-size: 12px; margin-bottom: 16px;">
+            <i class="fa-solid fa-circle-info"></i>
+            <div>
+              <strong>Captive Announcement Protocol (RFC 8910):</strong> This built-in DHCP server broadcasts <strong>Option 114</strong> (Captive Portal URI) directly to all connecting mobile devices, automatically triggering the system login popup on iOS, Android, and Windows.
+            </div>
+          </div>
+
+          {{#if dhcpLeases.length}}
+            <div class="table-responsive">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th>Hardware MAC Address</th>
+                    <th>Assigned IPv4 Address</th>
+                    <th>Client Hostname</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each dhcpLeases}}
+                    <tr>
+                      <td class="mono"><strong>{{this.mac}}</strong></td>
+                      <td class="mono" style="color: var(--neon-cyan);">{{this.ip}}</td>
+                      <td>{{this.hostname}}</td>
+                    </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          {{else}}
+            <div class="empty-state mono">
+              {{#if dhcpActive}}
+                No active DHCP leases currently issued. Connect Wi-Fi client devices to test lease assignment.
+              {{else}}
+                Integrated DHCP is in standby. Run server with elevated permissions (<code>sudo npm start</code>) and disable router DHCP to take over lease assignment.
+              {{/if}}
+            </div>
+          {{/if}}
+        </div>
+      {{/if}}
+
+      <!-- ==================== TAB 5: USERS ==================== -->
+      {{#if isTabUsers}}
+        <div class="cyber-card">
+          <div class="card-title-bar">
+            <div class="card-title display"><i class="fa-solid fa-users" style="color: var(--neon-purple);"></i> Authorized Client Accounts ({{usersList.length}})</div>
+          </div>
+
+          <!-- Create User Form -->
+          <form method="POST" action="/admin/users/create" class="action-bar-form">
+            <div style="font-weight: 700; font-size: 12px; color: var(--neon-cyan); margin-bottom: 8px;">
+              <i class="fa-solid fa-user-plus"></i> ENROLL NEW CLIENT USER:
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px;">
+              <input type="text" name="username" placeholder="Username (required)" required style="padding: 8px 12px; background: var(--cyber-panel); border: 1px solid var(--cyber-border); color: var(--text-main); border-radius: var(--radius-sm);">
+              <input type="password" name="password" placeholder="Password (required)" required style="padding: 8px 12px; background: var(--cyber-panel); border: 1px solid var(--cyber-border); color: var(--text-main); border-radius: var(--radius-sm);">
+              <input type="text" name="reference_number" placeholder="Room / Reference (Optional)" style="padding: 8px 12px; background: var(--cyber-panel); border: 1px solid var(--cyber-border); color: var(--text-main); border-radius: var(--radius-sm);">
+              <button type="submit" class="btn btn-primary btn-sm">Create Account</button>
+            </div>
+          </form>
+
+          {{#if usersList.length}}
+            <div class="table-responsive" style="margin-top: 16px;">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Voucher / Room #</th>
+                    <th>Enrolled At</th>
+                    <th style="text-align: center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each usersList}}
+                    <tr>
+                      <td class="mono">#{{this.id}}</td>
+                      <td class="mono"><strong>{{this.username}}</strong></td>
+                      <td>{{#if this.reference_number}}{{this.reference_number}}{{else}}<span style="color: var(--text-muted);">-</span>{{/if}}</td>
+                      <td class="mono" style="font-size: 11px; color: var(--text-muted);">{{this.created_at}}</td>
+                      <td style="text-align: center;">
+                        <form method="POST" action="/admin/users/delete" onsubmit="return confirm('Delete client {{this.username}}?');" style="margin: 0;">
+                          <input type="hidden" name="id" value="{{this.id}}">
+                          <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>Delete</span>
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          {{else}}
+            <div class="empty-state mono">No client accounts enrolled yet. Use the form above to add credentials.</div>
+          {{/if}}
+        </div>
+      {{/if}}
+
+      <!-- ==================== TAB 6: BRANDING ==================== -->
+      {{#if isTabBranding}}
+        <div class="cyber-card">
+          <div class="card-title-bar">
+            <div class="card-title display"><i class="fa-solid fa-palette" style="color: var(--neon-pink);"></i> Portal Branding & Visual Customizer</div>
+          </div>
+
+          <form method="POST" action="/admin/branding/toggle" style="margin-bottom: 20px;">
+            <div class="control-row" style="background: var(--cyber-panel); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--cyber-border);">
+              <div>
+                <strong style="color: var(--text-main); font-size: 13px;">Enterprise Wallpaper & Identity Toggle</strong>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                  Current Status: {{#if isEnterpriseBranding}}<span class="badge badge-success">ENABLED (Custom Wallpaper Displayed)</span>{{else}}<span class="badge badge-neutral">DISABLED (Clean Cyber Minimal Theme)</span>{{/if}}
+                </div>
+              </div>
+              <button type="submit" class="btn {{#if isEnterpriseBranding}}btn-danger{{else}}btn-primary{{/if}} btn-sm">
+                {{#if isEnterpriseBranding}}Disable Custom Wallpaper{{else}}Enable Custom Wallpaper{{/if}}
+              </button>
+            </div>
+          </form>
+
+          <!-- Select Wallpaper Grid -->
+          <div style="margin-bottom: 24px;">
+            <div class="mono" style="font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 10px; text-transform: uppercase;">
+              SELECT FROM PRESET WALLPAPERS:
+            </div>
+            <form method="POST" action="/admin/wallpaper/select">
+              <div class="wallpaper-grid">
+                {{#each wallpapers}}
+                  <label class="wallpaper-card {{#if this.isSelected}}active{{/if}}" onclick="selectWp(this)">
+                    <input type="radio" name="selected_wallpaper" value="{{this.url}}" {{#if this.isSelected}}checked{{/if}} style="display: none;">
+                    <img src="{{this.url}}" alt="{{this.name}}">
+                    <div class="card-label mono">{{this.name}}</div>
+                  </label>
+                {{/each}}
+              </div>
+              <button type="submit" class="btn btn-secondary btn-sm" style="margin-top: 12px;">Apply Selected Wallpaper</button>
+            </form>
+          </div>
+
+          <!-- Upload Custom Wallpaper -->
+          <div style="border-top: 1px solid var(--cyber-border); padding-top: 18px;">
+            <div class="mono" style="font-size: 11px; font-weight: 700; color: var(--text-sub); margin-bottom: 10px; text-transform: uppercase;">
+              UPLOAD CUSTOM CYBER WALLPAPER:
+            </div>
+            <form method="POST" action="/admin/wallpaper/upload" enctype="multipart/form-data" style="display: flex; gap: 12px; align-items: center;">
+              <input type="file" name="wallpaper_file" accept="image/*" required style="flex: 1; padding: 8px; background: var(--cyber-panel); border: 1px solid var(--cyber-border); color: var(--text-main); border-radius: var(--radius-sm);">
+              <button type="submit" class="btn btn-primary btn-sm">Upload & Set Active</button>
+            </form>
+          </div>
+        </div>
+      {{/if}}
+
+      <!-- ==================== TAB 7: DIAGNOSTICS ==================== -->
+      {{#if isTabDiagnostics}}
+        <div class="cyber-card">
+          <div class="card-title-bar">
+            <div class="card-title display"><i class="fa-solid fa-microchip" style="color: var(--neon-cyan);"></i> Network Pre-Flight & Router Diagnostics</div>
+            <a href="/admin/dashboard?tab=diagnostics" class="btn btn-secondary btn-sm">
+              <i class="fa-solid fa-rotate"></i>
+              <span>Refresh Checks</span>
+            </a>
+          </div>
+
+          <!-- Static IP & Router DNS Advice Panel -->
+          <div style="background: rgba(255, 184, 0, 0.08); border: 1px solid rgba(255, 184, 0, 0.35); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 16px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--neon-amber); margin-bottom: 6px;">
+              <i class="fa-solid fa-shield-halved"></i> CRITICAL ROUTER SETTINGS:
+            </div>
+            <div style="font-size: 11px; color: var(--text-sub); line-height: 1.5;">
+              1. <strong>STATIC IP RESERVATION:</strong> Ensure your router permanently binds IP <code>{{detected_ip}}</code> to MAC <code>{{diagnostics.primaryMac}}</code>.<br>
+              2. <strong>DNS DELEGATION:</strong> Router Primary DNS (DNS 1) must point directly to <code>{{detected_ip}}</code> (this machine itself). Leave Secondary DNS blank!
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="cyber-table">
+              <thead>
+                <tr>
+                  <th>Diagnostic Test</th>
+                  <th>Detected Value</th>
+                  <th>Status</th>
+                  <th>Details & Recommendations</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each diagnostics.checks}}
+                  <tr>
+                    <td><strong>{{this.title}}</strong></td>
+                    <td class="mono">{{this.value}}</td>
+                    <td>
+                      {{#if (eq this.status "ok")}}
+                        <span class="badge badge-success">Passed</span>
+                      {{else if (eq this.status "warning")}}
+                        <span class="badge badge-warning">Notice</span>
+                      {{else}}
+                        <span class="badge badge-danger">Blocked</span>
+                      {{/if}}
+                    </td>
+                    <td style="font-size: 11px; color: var(--text-sub);">
+                      {{this.details}}
+                      {{#if this.recommendation}}
+                        <div style="color: var(--neon-cyan); font-weight: 600; margin-top: 3px;">{{this.recommendation}}</div>
+                      {{/if}}
+                    </td>
+                  </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {{/if}}
+
+      <!-- ==================== TAB 8: SETTINGS ==================== -->
+      {{#if isTabSettings}}
+        <div class="cyber-card">
+          <div class="card-title-bar">
+            <div class="card-title display"><i class="fa-solid fa-sliders" style="color: var(--neon-cyan);"></i> Core Gateway Configuration</div>
+          </div>
+
+          <form method="POST" action="/admin/settings">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label for="server_ip">Portal Server IP Address</label>
+                <input type="text" id="server_ip" name="server_ip" value="{{settings.server_ip}}" required>
+                <small>Machine LAN IP on router network.</small>
+              </div>
+
+              <div class="form-group">
+                <label for="local_domain">Portal Local Domain</label>
+                <input type="text" id="local_domain" name="local_domain" value="{{settings.local_domain}}" required>
+                <small>Domain hijacked to present captive portal.</small>
+              </div>
+
+              <div class="form-group">
+                <label for="session_hours">Session Duration (Hours)</label>
+                <input type="number" id="session_hours" name="session_hours" value="{{settings.session_hours}}" min="1" max="720" required>
+                <small>Time before client must authenticate again.</small>
+              </div>
+
+              <div class="form-group">
+                <label for="admin_password">Update Admin Password</label>
+                <input type="password" id="admin_password" name="admin_password" placeholder="Leave blank to keep unchanged">
+                <small>Secured with native node:crypto scrypt hashing.</small>
+              </div>
+
+              <div class="form-group">
+                <label for="enterprise_name">Enterprise / Organization Name</label>
+                <input type="text" id="enterprise_name" name="enterprise_name" value="{{settings.enterprise_name}}">
+              </div>
+
+              <div class="form-group">
+                <label for="enterprise_tagline">Enterprise Tagline</label>
+                <input type="text" id="enterprise_tagline" name="enterprise_tagline" value="{{settings.enterprise_tagline}}">
+              </div>
+            </div>
+
+            <div style="margin-top: 16px; border-top: 1px solid var(--cyber-border); padding-top: 16px;">
+              <button type="submit" class="btn btn-primary">Save All Configuration Changes</button>
+            </div>
+          </form>
+        </div>
+      {{/if}}
+
+    </div>
+  </main>
+</div>
+
+<!-- Scoped Cyber Styles for Dashboard Layout -->
+<style>
+  .cyber-sidebar {
+    width: 270px;
+    min-width: 270px;
+    height: 100vh;
+    background: #090c13;
+    border-right: 1px solid var(--cyber-border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .sidebar-brand {
+    padding: 20px 18px;
+    border-bottom: 1px solid var(--cyber-border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-crest {
+    width: 38px;
+    height: 38px;
+    background: var(--cyber-panel);
+    border: 1px solid var(--neon-cyan);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 0 10px var(--neon-cyan-glow);
+  }
+  .jp-crest {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--neon-cyan);
+  }
+  .brand-title {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--text-main);
+  }
+  .brand-sub {
+    font-size: 9px;
+    color: var(--neon-pink);
+    letter-spacing: 0.5px;
+  }
+  .sidebar-operator {
+    padding: 12px 18px;
+    background: #0c101a;
+    border-bottom: 1px solid var(--cyber-border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .operator-avatar {
+    width: 30px;
+    height: 30px;
+    background: var(--cyber-panel);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--neon-cyan);
+    font-size: 13px;
+  }
+  .operator-name { font-size: 12px; font-weight: 700; color: var(--text-main); }
+  .operator-role { font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+  .status-dot { width: 6px; height: 6px; background: var(--neon-green); border-radius: 50%; box-shadow: 0 0 6px var(--neon-green); }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 12px;
+  }
+  .nav-section-title {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    padding: 6px 8px;
+  }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    margin-bottom: 3px;
+    color: var(--text-sub);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s ease;
+    border-left: 2px solid transparent;
+  }
+  .nav-link i { font-size: 14px; width: 18px; text-align: center; color: var(--text-muted); transition: color 0.15s; }
+  .nav-link:hover {
+    background: rgba(0, 240, 255, 0.05);
+    color: var(--text-main);
+  }
+  .nav-link:hover i { color: var(--neon-cyan); }
+  .nav-link.active {
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--neon-cyan);
+    border-left-color: var(--neon-cyan);
+    box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.05);
+  }
+  .nav-link.active i { color: var(--neon-cyan); }
+  .nav-jp { font-size: 9px; margin-left: auto; color: var(--text-dim); }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--cyber-panel);
+    border: 1px solid var(--cyber-border);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    color: var(--text-sub);
+  }
+  .nav-dot-active {
+    width: 6px; height: 6px; background: var(--neon-cyan); border-radius: 50%; margin-left: auto; box-shadow: 0 0 6px var(--neon-cyan);
+  }
+
+  .sidebar-footer {
+    padding: 14px 16px;
+    border-top: 1px solid var(--cyber-border);
+    background: #090c13;
+  }
+  .footer-telemetry {
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+
+  /* Main Viewport */
+  .cyber-main {
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+  .cyber-topbar {
+    height: 56px;
+    padding: 0 24px;
+    background: #0a0e16;
+    border-bottom: 1px solid var(--cyber-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 9;
+  }
+  .view-tag {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--text-main);
+  }
+  .topbar-telemetry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .telemetry-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--cyber-panel);
+    border: 1px solid var(--cyber-border);
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    color: var(--text-sub);
+  }
+
+  .cyber-content-container {
+    flex: 1;
+    padding: 24px;
+    max-width: 1500px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Metric Deck */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .cyber-metric-card {
+    background: var(--cyber-card);
+    border: 1px solid var(--cyber-border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cyber-metric-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--neon-cyan), transparent);
+  }
+  .metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .metric-label { font-size: 10px; font-weight: 700; color: var(--text-muted); }
+  .metric-number { font-size: 26px; font-weight: 800; }
+  .metric-sub { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 18px;
+  }
+  .card-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--cyber-border);
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .control-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+  }
+  .empty-state {
+    padding: 24px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .action-bar-form {
+    background: var(--cyber-panel);
+    border: 1px solid var(--cyber-border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+  }
+
+  /* Wallpaper Grid */
+  .wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .wallpaper-card {
+    border: 1px solid var(--cyber-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--cyber-panel);
+    display: block;
+    position: relative;
+  }
+  .wallpaper-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+  }
+  .wallpaper-card .card-label {
+    padding: 6px 10px;
+    font-size: 11px;
+    color: var(--text-sub);
+    text-align: center;
+  }
+  .wallpaper-card:hover {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan-glow);
+  }
+  .wallpaper-card.active {
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 15px var(--neon-pink-glow);
+  }
+
+  @media (max-width: 1024px) {
+    .metric-grid { grid-template-columns: 1fr 1fr; }
+    .overview-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  function selectWp(card) {
+    document.querySelectorAll('.wallpaper-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    const radio = card.querySelector('input[type="radio"]');
+    if (radio) radio.checked = true;
+  }
+</script>

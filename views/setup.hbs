@@ -1,0 +1,466 @@
+<div class="fullscreen-setup-wrapper">
+  <div class="cyber-setup-deck">
+
+    <!-- Brand Header -->
+    <div class="deck-header">
+      <div class="brand-crest" style="margin-bottom: 10px;">
+        <span class="jp-crest">南</span>
+      </div>
+      <h1 class="display" style="font-size: 24px; color: var(--text-main); letter-spacing: 1px;">Initial Setup & Network Provisioning</h1>
+      <p class="brand-subtitle mono" style="font-size: 11px; color: var(--neon-cyan); margin-top: 4px;">
+        Minami's Captive &bull; Consumer Router Gateway Provisioning Wizard // 初期設定
+      </p>
+    </div>
+
+    {{#if error}}
+      <div class="alert alert-danger">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div>{{error}}</div>
+      </div>
+    {{/if}}
+
+    <!-- Server Bypass Notification -->
+    <div class="alert alert-info">
+      <i class="fa-solid fa-shield-halved" style="color: var(--neon-cyan);"></i>
+      <div>
+        <strong>Server Internet Bypass Active:</strong> Outbound internet traffic for this server host (local processes, DNS queries, package managers) is automatically excluded from the captive portal authentication wall.
+      </div>
+    </div>
+
+    <!-- Pre-Flight Diagnostics Deck -->
+    <div class="cyber-card" style="margin-bottom: 20px;">
+      <div class="card-title-bar">
+        <div class="card-title display">
+          <i class="fa-solid fa-microchip" style="color: var(--neon-cyan);"></i>
+          <span>Pre-Flight Network & Environment Diagnostics</span>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-recheck" onclick="runDiagnosticsCheck()">
+          <i class="fa-solid fa-rotate"></i>
+          <span>Re-Run Diagnostics</span>
+        </button>
+      </div>
+
+      <div id="diagnostics-summary">
+        {{#if diagnostics.allPassed}}
+          <div class="alert alert-success" style="font-size: 12px; margin-bottom: 14px;">
+            <i class="fa-solid fa-circle-check"></i>
+            <div><strong>Ready for Launch:</strong> All core network adapters, router connectivity, and service ports are verified.</div>
+          </div>
+        {{else}}
+          <div class="alert alert-warning" style="font-size: 12px; margin-bottom: 14px;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div><strong>Attention Needed:</strong> Review the diagnostic checks below before launching the captive portal.</div>
+          </div>
+        {{/if}}
+      </div>
+
+      <div class="table-responsive">
+        <table class="cyber-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">Test / Resource</th>
+              <th style="width: 25%;">Detected Value</th>
+              <th style="width: 15%;">Status</th>
+              <th>Details & Recommendations</th>
+            </tr>
+          </thead>
+          <tbody id="diagnostics-tbody">
+            {{#each diagnostics.checks}}
+              <tr>
+                <td><strong>{{this.title}}</strong></td>
+                <td class="mono" style="color: var(--neon-cyan);">{{this.value}}</td>
+                <td>
+                  {{#if (eq this.status "ok")}}
+                    <span class="badge badge-success">Passed</span>
+                  {{else if (eq this.status "warning")}}
+                    <span class="badge badge-warning">Notice</span>
+                  {{else}}
+                    <span class="badge badge-danger">Blocked</span>
+                  {{/if}}
+                </td>
+                <td style="font-size: 11px; color: var(--text-sub);">
+                  {{this.details}}
+                  {{#if this.recommendation}}
+                    <div style="color: var(--neon-cyan); font-weight: 600; margin-top: 3px;">{{this.recommendation}}</div>
+                  {{/if}}
+                </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <form method="POST" action="/setup/complete" enctype="multipart/form-data">
+      
+      <!-- 1. Network & Router Configuration -->
+      <div class="cyber-card" style="margin-bottom: 20px;">
+        <div class="card-title-bar">
+          <div class="card-title display">
+            <i class="fa-solid fa-network-wired" style="color: var(--neon-cyan);"></i>
+            <span>1. Network & Router Configuration</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="server_ip">
+            <i class="fa-solid fa-router" style="color: var(--neon-cyan); margin-right: 4px;"></i>
+            <span>Server IP Address (Machine IP on Router Network)</span>
+          </label>
+          <input type="text" id="server_ip" class="mono" name="server_ip" value="{{server_ip}}" required placeholder="e.g. 192.168.0.102">
+          
+          <div style="margin-top: 8px;">
+            <span class="badge badge-success mono">
+              <i class="fa-solid fa-check"></i> Auto-Detected Primary LAN IP: {{detected_ip}}
+            </span>
+          </div>
+        </div>
+
+        {{#if networkInterfaces.length}}
+          <div style="margin-top: 12px; margin-bottom: 16px;">
+            <div class="mono" style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">
+              DETECTED HOST NETWORK ADAPTERS:
+            </div>
+            <div class="table-responsive">
+              <table class="cyber-table">
+                <thead>
+                  <tr>
+                    <th>Adapter</th>
+                    <th>IPv4 Address</th>
+                    <th>Subnet Mask</th>
+                    <th>MAC Address</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each networkInterfaces}}
+                    <tr>
+                      <td><strong>{{this.interface}}</strong></td>
+                      <td class="mono" style="color: var(--neon-cyan);">{{this.address}}</td>
+                      <td class="mono" style="color: var(--text-muted);">{{this.netmask}}</td>
+                      <td class="mono" style="font-size: 11px;">{{#if this.mac}}{{this.mac}}{{else}}-{{/if}}</td>
+                      <td>
+                        {{#if this.isDetected}}
+                          <span class="badge badge-success">Primary LAN</span>
+                        {{else}}
+                          <span class="badge badge-neutral">Active</span>
+                        {{/if}}
+                      </td>
+                    </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {{/if}}
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label for="local_domain">Local Captive Domain</label>
+            <input type="text" id="local_domain" class="mono" name="local_domain" value="{{local_domain}}" required placeholder="e.g. myportal.sc">
+            <small>Domain hijacked to present captive portal screen.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="session_hours">Session Duration (Hours)</label>
+            <input type="number" id="session_hours" name="session_hours" value="{{session_hours}}" min="1" max="720" required>
+            <small>Client internet validity before requiring re-login.</small>
+          </div>
+        </div>
+
+        <!-- Required Router Configuration Guide -->
+        <div style="background: var(--cyber-panel); border: 1px solid var(--cyber-border); border-radius: var(--radius-sm); padding: 16px; margin-top: 14px;">
+          <div style="font-size: 13px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <i class="fa-solid fa-router" style="color: var(--neon-cyan);"></i>
+            <span>Required Consumer Router Configuration</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px; line-height: 1.4;">
+            To direct Wi-Fi and LAN devices to this captive portal, configure your consumer router using one of the options below:
+          </div>
+
+          <!-- Prerequisite Callout: Static IP / DHCP Reservation -->
+          <div style="background: rgba(255, 184, 0, 0.08); border: 1px solid rgba(255, 184, 0, 0.35); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <i class="fa-solid fa-shield-halved" style="color: var(--neon-amber);"></i>
+              <strong style="color: var(--neon-amber); font-size: 12px;">Step 0: Reserve Static IP for this Server in Router (Crucial)</strong>
+            </div>
+            <div style="font-size: 11px; color: var(--text-sub); line-height: 1.5;">
+              Before changing router settings, ensure your router always assigns the exact same IP to this computer:
+              <div style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 14px;">
+                <span>&bull; Server IP: <strong class="mono" style="color: var(--neon-cyan);">{{server_ip}}</strong></span>
+                {{#if diagnostics.primaryMac}}
+                  <span>&bull; Server MAC Address: <strong class="mono" style="color: var(--neon-pink);">{{diagnostics.primaryMac}}</strong></span>
+                {{/if}}
+              </div>
+              <div style="margin-top: 4px; color: var(--neon-amber); font-size: 10px; font-weight: 600;">
+                In Router Admin &rarr; <em>DHCP Static Leases / Address Reservation</em>, permanently bind this MAC address to this IP so the server IP never changes on reboot.
+              </div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <!-- Mode A (Recommended) -->
+            <div style="background: #0f1422; border: 1px solid var(--neon-cyan); border-radius: var(--radius-sm); padding: 14px; box-shadow: 0 0 15px rgba(0, 240, 255, 0.08);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <strong style="color: var(--neon-cyan); font-size: 12px;">MODE A (RECOMMENDED)</strong>
+                <span class="badge badge-success" style="font-size: 10px;">Zero Client Setup</span>
+              </div>
+              <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px; color: var(--text-main);">Use Integrated DHCP Server</div>
+              <ol style="font-size: 11px; color: var(--text-sub); padding-left: 18px; margin: 0; line-height: 1.5;">
+                <li>Open router admin (e.g. <code>http://{{diagnostics.estimatedGateway}}</code>).</li>
+                <li>Go to <strong>DHCP Server</strong> settings.</li>
+                <li>Set <strong>DHCP Server: Disabled / OFF</strong>.</li>
+                <li>Run this server with <code>sudo</code>.</li>
+              </ol>
+              <div style="font-size: 10px; color: var(--neon-green); margin-top: 8px; font-weight: 600;">
+                &#10003; Automatically assigns IP & triggers RFC 8910 captive popup on phones and laptops.
+              </div>
+            </div>
+
+            <!-- Mode B -->
+            <div style="background: #0f1422; border: 1px solid var(--cyber-border); border-radius: var(--radius-sm); padding: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <strong style="color: var(--text-sub); font-size: 12px;">MODE B (MANUAL DNS)</strong>
+                <span class="badge badge-neutral" style="font-size: 10px;">Router DHCP ON</span>
+              </div>
+              <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px; color: var(--text-main);">Point Router DNS to this Server</div>
+              <ol style="font-size: 11px; color: var(--text-sub); padding-left: 18px; margin: 0; line-height: 1.5;">
+                <li>Open router admin.</li>
+                <li>Go to <strong>LAN / DHCP Server</strong> settings.</li>
+                <li>Set <strong>Primary DNS (DNS 1)</strong> to: <code class="mono" style="color: var(--neon-cyan);">{{server_ip}}</code> (this machine itself)</li>
+                <li>Leave <strong>Secondary DNS</strong> blank.</li>
+              </ol>
+              <div style="font-size: 10px; color: var(--neon-amber); margin-top: 8px; font-weight: 600;">
+                &#9888; Router DNS MUST point directly to this machine's IP ({{server_ip}}). Do NOT enter 8.8.8.8 as secondary DNS!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Enterprise Branding & Wallpaper -->
+      <div class="cyber-card" style="margin-bottom: 20px;">
+        <div class="card-title-bar">
+          <div class="card-title display">
+            <i class="fa-solid fa-palette" style="color: var(--neon-pink);"></i>
+            <span>2. Enterprise Branding & Wallpaper</span>
+          </div>
+        </div>
+
+        <div style="background: var(--cyber-panel); border: 1px solid var(--cyber-border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 16px;">
+          <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; margin: 0;">
+            <input type="checkbox" name="enable_enterprise_branding" value="true" id="enable_enterprise_branding" {{#if enable_enterprise_branding}}checked{{/if}} style="width: 18px; height: 18px; margin-top: 2px; cursor: pointer;" onchange="toggleBrandingNotice(this)">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <strong style="color: var(--text-main); font-size: 13px;">Enable Enterprise Branding & Custom Wallpaper</strong>
+                <span class="badge badge-neutral" style="font-size: 10px;">Default: OFF</span>
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px; line-height: 1.4;">
+                When disabled (default), the portal operates in clean Minami's Captive mode with no wallpaper. When enabled, your organization name, tagline, and chosen wallpaper are displayed on client screens.
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <div id="enterprise-branding-fields" style="{{#unless enable_enterprise_branding}}opacity: 0.85;{{/unless}} transition: opacity 0.2s;">
+          <div class="form-group">
+            <label for="enterprise_name">Enterprise / Organization Name</label>
+            <input type="text" id="enterprise_name" name="enterprise_name" value="{{enterprise_name}}" placeholder="e.g. Minami Enterprise Network">
+          </div>
+
+          <div class="form-group">
+            <label for="enterprise_tagline">Portal Tagline</label>
+            <input type="text" id="enterprise_tagline" name="enterprise_tagline" value="{{enterprise_tagline}}" placeholder="e.g. High-Speed Secure Wi-Fi 6 Access">
+          </div>
+
+          <div class="form-group">
+            <label>Select Background Wallpaper (Preset Gallery)</label>
+            <div class="wallpaper-grid">
+              {{#each wallpapers}}
+                <label class="wallpaper-card {{#if this.isSelected}}active{{/if}}" onclick="selectWp(this)">
+                  <input type="radio" name="selected_wallpaper" value="{{this.url}}" {{#if this.isSelected}}checked{{/if}} style="display: none;">
+                  <img src="{{this.url}}" alt="{{this.name}}">
+                  <div class="card-label mono">{{this.name}}</div>
+                </label>
+              {{/each}}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="custom_wallpaper">Or Upload a Custom Wallpaper Image</label>
+            <input type="file" id="custom_wallpaper" name="custom_wallpaper" accept="image/*" style="padding: 8px; background: var(--cyber-panel); border: 1px solid var(--cyber-border); color: var(--text-main); border-radius: var(--radius-sm); width: 100%;">
+            <small>Supports JPG, PNG, GIF, WEBP (Saved locally in public folder).</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Administrator Credentials -->
+      <div class="cyber-card" style="margin-bottom: 20px;">
+        <div class="card-title-bar">
+          <div class="card-title display">
+            <i class="fa-solid fa-lock" style="color: var(--neon-cyan);"></i>
+            <span>3. Administrator Account Credentials</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="admin_username">Admin Username</label>
+          <input type="text" id="admin_username" name="admin_username" value="{{admin_username}}" required placeholder="admin">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label for="admin_password">Admin Password</label>
+            <input type="password" id="admin_password" name="admin_password" required placeholder="Create password">
+          </div>
+
+          <div class="form-group">
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm password">
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="font-size: 14px; padding: 14px; width: 100%;">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Complete Setup & Launch Gateway Portal</span>
+      </button>
+    </form>
+
+    <div class="footer-brand mono" style="margin-top: 24px; font-size: 11px; color: var(--text-dim); text-align: center;">
+      南 Minami's Captive By <a href="https://github.com/pratykash-ops" target="_blank" style="color: var(--text-muted);">pratyaksh</a>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .fullscreen-setup-wrapper {
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    padding: 36px 16px;
+  }
+  .cyber-setup-deck {
+    width: 100%;
+    max-width: 980px;
+  }
+  .deck-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .brand-crest {
+    width: 48px; height: 48px;
+    background: var(--cyber-panel);
+    border: 1px solid var(--neon-cyan);
+    border-radius: var(--radius-sm);
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 15px var(--neon-cyan-glow);
+  }
+  .jp-crest { font-size: 24px; font-weight: 900; color: var(--neon-cyan); }
+  .card-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--cyber-border);
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .wallpaper-card {
+    border: 1px solid var(--cyber-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--cyber-panel);
+    display: block;
+  }
+  .wallpaper-card img {
+    width: 100%;
+    height: 95px;
+    object-fit: cover;
+    display: block;
+  }
+  .wallpaper-card .card-label {
+    padding: 5px 8px;
+    font-size: 10px;
+    color: var(--text-sub);
+    text-align: center;
+  }
+  .wallpaper-card:hover { border-color: var(--neon-cyan); }
+  .wallpaper-card.active { border-color: var(--neon-pink); box-shadow: 0 0 12px var(--neon-pink-glow); }
+</style>
+
+<script>
+  function selectWp(card) {
+    document.querySelectorAll('.wallpaper-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    const radio = card.querySelector('input[type="radio"]');
+    if (radio) radio.checked = true;
+  }
+
+  function toggleBrandingNotice(checkbox) {
+    const container = document.getElementById('enterprise-branding-fields');
+    if (container) {
+      container.style.opacity = checkbox.checked ? '1' : '0.85';
+    }
+  }
+
+  async function runDiagnosticsCheck() {
+    const btn = document.getElementById('btn-recheck');
+    const tbody = document.getElementById('diagnostics-tbody');
+    const summary = document.getElementById('diagnostics-summary');
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Checking...</span>';
+
+    try {
+      const res = await fetch('/setup/diagnostics');
+      const data = await res.json();
+      
+      if (summary) {
+        if (data.allPassed) {
+          summary.innerHTML = '<div class="alert alert-success" style="font-size: 12px; margin-bottom: 14px;"><i class="fa-solid fa-circle-check"></i> <div><strong>Ready for Launch:</strong> All network checks, router reachability, and ports are verified.</div></div>';
+        } else {
+          summary.innerHTML = '<div class="alert alert-warning" style="font-size: 12px; margin-bottom: 14px;"><i class="fa-solid fa-triangle-exclamation"></i> <div><strong>Attention Needed:</strong> Review the diagnostic checks below before launching the captive portal.</div></div>';
+        }
+      }
+
+      if (tbody && data.checks) {
+        tbody.innerHTML = data.checks.map(c => `
+          <tr>
+            <td><strong>${c.title}</strong></td>
+            <td class="mono" style="color: var(--neon-cyan);">${c.value}</td>
+            <td>
+              ${c.status === 'ok' 
+                ? '<span class="badge badge-success">Passed</span>' 
+                : (c.status === 'warning' 
+                    ? '<span class="badge badge-warning">Notice</span>' 
+                    : '<span class="badge badge-danger">Blocked</span>')}
+            </td>
+            <td style="font-size: 11px; color: var(--text-sub);">
+              ${c.details}
+              ${c.recommendation ? `<div style="color: var(--neon-cyan); font-weight: 600; margin-top: 3px;">${c.recommendation}</div>` : ''}
+            </td>
+          </tr>
+        `).join('');
+      }
+    } catch (e) {
+      alert('Error running diagnostics: ' + e.message);
+    } finally {
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-rotate"></i> <span>Re-Run Diagnostics</span>';
+    }
+  }
+</script>

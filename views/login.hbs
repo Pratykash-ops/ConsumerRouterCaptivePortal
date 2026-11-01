@@ -1,0 +1,167 @@
+<div class="fullscreen-portal-wrapper">
+  <div class="cyber-portal-card">
+    
+    <div class="network-badge-row">
+      <div class="cyber-live-badge mono">
+        <span class="live-dot"></span> Network Login &bull; Authentication Online
+      </div>
+      <span class="jp-badge mono">認証ゲートウェイ</span>
+    </div>
+
+    <div class="brand-header" style="text-align: center; margin: 16px 0 18px 0;">
+      <div class="brand-crest" style="margin: 0 auto 10px auto;">
+        <span class="jp-crest">南</span>
+      </div>
+      <h1 class="display" style="font-size: 20px; color: var(--text-main); letter-spacing: 0.5px;">
+        {{#if isEnterpriseBranding}}
+          {{#if enterprise_name}}{{enterprise_name}}{{else}}Minami's Captive{{/if}}
+        {{else}}
+          Minami's Captive
+        {{/if}}
+      </h1>
+      <p class="brand-subtitle mono" style="font-size: 11px; color: var(--neon-cyan); margin-top: 4px;">
+        {{#if isEnterpriseBranding}}
+          {{#if enterprise_tagline}}{{enterprise_tagline}}{{else}}Enterprise High-Speed Internet Access{{/if}}
+        {{else}}
+          Enterprise High-Speed Internet Access
+        {{/if}}
+      </p>
+    </div>
+
+    {{#if error}}
+      <div class="alert alert-danger">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div>{{error}}</div>
+      </div>
+    {{/if}}
+
+    <form method="POST" action="/auth/login">
+      <div class="form-group">
+        <label for="username">
+          <i class="fa-solid fa-user-astronaut" style="color: var(--neon-cyan); margin-right: 4px;"></i>
+          <span>Username / Passcode ID</span>
+        </label>
+        <input type="text" id="username" name="username" placeholder="Assigned account name" required autofocus autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label for="password">
+          <i class="fa-solid fa-key" style="color: var(--neon-pink); margin-right: 4px;"></i>
+          <span>Password</span>
+        </label>
+        <input type="password" id="password" name="password" placeholder="Passcode" required autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 6px;">
+        <i class="fa-solid fa-satellite-dish"></i>
+        <span>Connect to Internet</span>
+      </button>
+    </form>
+
+    <!-- Network Policy Box -->
+    <div class="network-info-panel">
+      <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-shield-halved" style="color: var(--neon-cyan);"></i>
+        <span>Authorized Network Access Policy</span>
+      </div>
+      <div style="color: var(--text-sub); line-height: 1.4;">
+        Access is controlled by this local gateway. Please enter credentials provided by your network administrator.
+      </div>
+      <div class="policy-footer mono">
+        <span>SESSION LIFETIME:</span>
+        <strong style="color: var(--neon-cyan);">{{#if session_hours}}{{session_hours}}h{{else}}24h{{/if}}</strong>
+      </div>
+    </div>
+
+    <div style="margin-top: 14px; text-align: center;">
+      <a href="/admin/login" class="mono" style="color: var(--neon-cyan); text-decoration: none; font-size: 11px; display: inline-flex; align-items: center; gap: 5px;">
+        <i class="fa-solid fa-terminal"></i>
+        <span>Admin Console</span>
+      </a>
+    </div>
+
+    <div class="footer-brand mono" style="margin-top: 12px; font-size: 10px; color: var(--text-dim); text-align: center;">
+      南 Minami's Captive By <a href="https://github.com/pratykash-ops" target="_blank" style="color: var(--text-muted);">pratyaksh</a>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .fullscreen-portal-wrapper {
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .cyber-portal-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--cyber-card);
+    border: 1px solid var(--cyber-border);
+    border-radius: var(--radius);
+    padding: 26px 24px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 240, 255, 0.08);
+    position: relative;
+  }
+  .cyber-portal-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+  }
+  .network-badge-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cyber-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(5, 255, 161, 0.08);
+    border: 1px solid rgba(5, 255, 161, 0.25);
+    color: var(--neon-green);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+  .live-dot {
+    width: 6px; height: 6px;
+    background: var(--neon-green);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--neon-green);
+  }
+  .jp-badge { font-size: 10px; color: var(--text-dim); }
+  .brand-crest {
+    width: 42px; height: 42px;
+    background: var(--cyber-panel);
+    border: 1px solid var(--neon-cyan);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 12px var(--neon-cyan-glow);
+  }
+  .jp-crest { font-size: 22px; font-weight: 900; color: var(--neon-cyan); }
+  .network-info-panel {
+    background: var(--cyber-panel);
+    border: 1px solid var(--cyber-border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-top: 18px;
+    font-size: 11px;
+    text-align: left;
+  }
+  .policy-footer {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--cyber-border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+</style>

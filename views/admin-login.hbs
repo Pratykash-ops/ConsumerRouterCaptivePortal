@@ -1,0 +1,117 @@
+<div class="fullscreen-login-wrapper">
+  <div class="cyber-terminal-card">
+    <div class="terminal-header">
+      <div class="terminal-dots">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+      </div>
+      <div class="terminal-title mono">SECURE_TERMINAL // AUTH_PORT_01</div>
+    </div>
+
+    <div class="brand-header" style="text-align: center; padding: 18px 0 10px 0;">
+      <div class="brand-crest" style="margin: 0 auto 12px auto;">
+        <span class="jp-crest">南</span>
+      </div>
+      <h1 class="display" style="font-size: 22px; color: var(--text-main); letter-spacing: 1px;">Admin Terminal Login</h1>
+      <p class="brand-subtitle mono" style="font-size: 11px; color: var(--neon-cyan); margin-top: 4px;">Minami's Captive &bull; Gateway Management Console</p>
+    </div>
+
+    {{#if setupSuccess}}
+      <div class="alert alert-success">
+        <i class="fa-solid fa-circle-check"></i>
+        <div>Initial setup completed successfully! Log in below with your admin credentials.</div>
+      </div>
+    {{/if}}
+
+    {{#if error}}
+      <div class="alert alert-danger">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div>{{error}}</div>
+      </div>
+    {{/if}}
+
+    <form method="POST" action="/admin/login">
+      <div class="form-group">
+        <label for="username">
+          <i class="fa-solid fa-user-shield" style="color: var(--neon-cyan); margin-right: 4px;"></i>
+          <span>Admin Username</span>
+        </label>
+        <input type="text" id="username" name="username" placeholder="Operator username" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label for="password">
+          <i class="fa-solid fa-key" style="color: var(--neon-pink); margin-right: 4px;"></i>
+          <span>Password</span>
+        </label>
+        <input type="password" id="password" name="password" placeholder="Passcode" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 8px;">
+        <i class="fa-solid fa-fingerprint"></i>
+        <span>Access Admin Dashboard</span>
+      </button>
+    </form>
+
+    <div style="margin-top: 20px; text-align: center; border-top: 1px solid var(--cyber-border); padding-top: 14px;">
+      <a href="/portal/login" class="mono" style="color: var(--neon-cyan); text-decoration: none; font-size: 11px; display: inline-flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Return to Client Captive Portal</span>
+      </a>
+    </div>
+
+    <div class="footer-brand mono" style="margin-top: 12px; font-size: 10px; color: var(--text-dim); text-align: center;">
+      南 Minami's Captive By <a href="https://github.com/pratykash-ops" target="_blank" style="color: var(--text-muted);">pratyaksh</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .fullscreen-login-wrapper {
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .cyber-terminal-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--cyber-card);
+    border: 1px solid var(--cyber-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.08);
+    position: relative;
+  }
+  .cyber-terminal-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+  }
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--cyber-border);
+  }
+  .terminal-dots { display: flex; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot-red { background: #ff5f56; }
+  .dot-yellow { background: #ffbd2e; }
+  .dot-green { background: #27c93f; }
+  .terminal-title { font-size: 10px; color: var(--text-dim); letter-spacing: 0.5px; }
+  .brand-crest {
+    width: 44px; height: 44px;
+    background: var(--cyber-panel);
+    border: 1px solid var(--neon-cyan);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 15px var(--neon-cyan-glow);
+  }
+  .jp-crest { font-size: 22px; font-weight: 900; color: var(--neon-cyan); }
+</style>

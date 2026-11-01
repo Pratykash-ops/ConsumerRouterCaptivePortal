@@ -1,0 +1,95 @@
+<div class="fullscreen-portal-wrapper">
+  <div class="cyber-portal-card" style="max-width: 500px;">
+    
+    <div class="network-badge-row">
+      <div class="cyber-live-badge mono" style="background: rgba(5, 255, 161, 0.12); color: var(--neon-green); border-color: rgba(5, 255, 161, 0.35);">
+        <span class="live-dot" style="background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green);"></span>
+        Connection Authorized &bull; Internet Online
+      </div>
+      <span class="jp-badge mono">接続確立</span>
+    </div>
+
+    <div class="brand-header" style="text-align: center; margin: 18px 0 16px 0;">
+      <div class="brand-crest" style="margin: 0 auto 10px auto; border-color: var(--neon-green); box-shadow: 0 0 15px rgba(5, 255, 161, 0.3);">
+        <span class="jp-crest" style="color: var(--neon-green);">通</span>
+      </div>
+      <h1 class="display" style="font-size: 22px; color: var(--text-main); letter-spacing: 0.5px;">Internet Connected</h1>
+      <p class="brand-subtitle mono" style="font-size: 11px; color: var(--neon-cyan); margin-top: 4px;">
+        Authentication Wall Bypassed &bull; Traffic Unrestricted
+      </p>
+    </div>
+
+    <!-- Active Session Telemetry Box -->
+    <div class="network-info-panel">
+      <div style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-signal" style="color: var(--neon-green);"></i>
+        <span>Active Session Telemetry</span>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--cyber-border); padding-bottom: 6px; margin-bottom: 6px;">
+        <span style="color: var(--text-muted);">Client IPv4 Address:</span>
+        <strong class="mono" style="color: var(--neon-cyan);">{{clientIP}}</strong>
+      </div>
+      
+      {{#if session.username}}
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--cyber-border); padding-bottom: 6px; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Authorized Account:</span>
+          <strong class="mono" style="color: var(--text-main);">{{session.username}}</strong>
+        </div>
+      {{/if}}
+
+      {{#if session.reference_number}}
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--cyber-border); padding-bottom: 6px; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Room / Voucher Ref:</span>
+          <strong class="mono" style="color: var(--text-main);">{{session.reference_number}}</strong>
+        </div>
+      {{/if}}
+
+      {{#if session.authorized_at}}
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--cyber-border); padding-bottom: 6px; margin-bottom: 6px;">
+          <span style="color: var(--text-muted);">Authorized At:</span>
+          <span class="mono" style="color: var(--text-sub); font-size: 11px;">{{session.authorized_at}}</span>
+        </div>
+      {{/if}}
+
+      {{#if session.expires_at}}
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted);">Session Valid Until:</span>
+          <strong class="mono" style="color: var(--neon-pink);">{{session.expires_at}}</strong>
+        </div>
+      {{/if}}
+    </div>
+
+    <!-- Quick External Verification Links -->
+    <div style="margin-top: 18px;">
+      <div class="mono" style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+        EXTERNAL CONNECTIVITY TESTS:
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+        <a href="https://google.com" target="_blank" class="btn btn-secondary btn-sm" style="flex-direction: column; gap: 4px; padding: 12px 6px;">
+          <i class="fa-brands fa-google" style="font-size: 18px; color: var(--neon-cyan);"></i>
+          <span>Google</span>
+        </a>
+        <a href="https://fast.com" target="_blank" class="btn btn-secondary btn-sm" style="flex-direction: column; gap: 4px; padding: 12px 6px;">
+          <i class="fa-solid fa-gauge-high" style="font-size: 18px; color: var(--neon-green);"></i>
+          <span>Fast.com</span>
+        </a>
+        <a href="https://github.com" target="_blank" class="btn btn-secondary btn-sm" style="flex-direction: column; gap: 4px; padding: 12px 6px;">
+          <i class="fa-brands fa-github" style="font-size: 18px; color: var(--neon-pink);"></i>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px; text-align: center; border-top: 1px solid var(--cyber-border); padding-top: 14px;">
+      <a href="/admin/login" class="mono" style="color: var(--neon-cyan); text-decoration: none; font-size: 11px; display: inline-flex; align-items: center; gap: 6px;">
+        <i class="fa-solid fa-terminal"></i>
+        <span>Management Console</span>
+      </a>
+    </div>
+
+    <div class="footer-brand mono" style="margin-top: 12px; font-size: 10px; color: var(--text-dim); text-align: center;">
+      南 Minami's Captive By <a href="https://github.com/pratykash-ops" target="_blank" style="color: var(--text-muted);">pratyaksh</a>
+    </div>
+  </div>
+</div>

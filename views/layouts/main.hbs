@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} // 南 (MINAMI) CAPTIVE GATEWAY</title>
+  
+  <!-- FontAwesome 6 Pro-Grade Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Cyberpunk Fonts: Orbitron (Headings), JetBrains Mono (Code/Telemetry), Plus Jakarta Sans & Noto Sans JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Orbitron:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --cyber-bg: #07090e;
+      --cyber-bg-subtle: #0c0f18;
+      --cyber-card: #111522;
+      --cyber-card-hover: #161c2d;
+      --cyber-panel: #182033;
+      --cyber-border: #1e283d;
+      --cyber-border-bright: #2d3b58;
+      
+      --neon-cyan: #00f0ff;
+      --neon-cyan-glow: rgba(0, 240, 255, 0.35);
+      --neon-pink: #ff2a6d;
+      --neon-pink-glow: rgba(255, 42, 109, 0.35);
+      --neon-amber: #ffb800;
+      --neon-green: #05ffa1;
+      --neon-purple: #9d4edd;
+      
+      --text-main: #f1f5f9;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+      --text-dim: #475569;
+
+      --font-display: 'Orbitron', -apple-system, sans-serif;
+      --font-body: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --radius-sm: 4px;
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--cyber-bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-x: hidden;
+      {{#if wallpaper}}
+      background-image: linear-gradient(rgba(7, 9, 14, 0.82), rgba(7, 9, 14, 0.94)), url('{{wallpaper}}');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      {{/if}}
+    }
+
+    /* Cyber Scanline Grid Backdrop */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(rgba(0, 240, 255, 0.015) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(0, 240, 255, 0.015) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Custom Cyber Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--cyber-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--cyber-border-bright); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
+
+    /* Typography & Monospace */
+    .mono { font-family: var(--font-mono); }
+    .display { font-family: var(--font-display); letter-spacing: 0.5px; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-success { background: rgba(5, 255, 161, 0.12); color: var(--neon-green); border: 1px solid rgba(5, 255, 161, 0.3); }
+    .badge-danger { background: rgba(255, 42, 109, 0.12); color: var(--neon-pink); border: 1px solid rgba(255, 42, 109, 0.3); }
+    .badge-warning { background: rgba(255, 184, 0, 0.12); color: var(--neon-amber); border: 1px solid rgba(255, 184, 0, 0.3); }
+    .badge-neutral { background: rgba(148, 163, 184, 0.1); color: var(--text-sub); border: 1px solid var(--cyber-border); }
+    .badge-cyan { background: rgba(0, 240, 255, 0.12); color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.35); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary {
+      background: var(--neon-cyan);
+      color: #030812;
+      box-shadow: 0 0 15px var(--neon-cyan-glow);
+    }
+    .btn-primary:hover {
+      background: #33f3ff;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+    }
+    .btn-pink {
+      background: var(--neon-pink);
+      color: #ffffff;
+      box-shadow: 0 0 15px var(--neon-pink-glow);
+    }
+    .btn-pink:hover {
+      background: #ff4781;
+      box-shadow: 0 0 25px rgba(255, 42, 109, 0.6);
+    }
+    .btn-secondary {
+      background: var(--cyber-panel);
+      color: var(--text-main);
+      border-color: var(--cyber-border-bright);
+    }
+    .btn-secondary:hover {
+      background: var(--cyber-border);
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+    }
+    .btn-danger {
+      background: rgba(255, 42, 109, 0.15);
+      color: var(--neon-pink);
+      border-color: rgba(255, 42, 109, 0.4);
+    }
+    .btn-danger:hover {
+      background: var(--neon-pink);
+      color: #ffffff;
+    }
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
+
+    /* Alert Boxes */
+    .alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+    .alert-danger {
+      background: rgba(255, 42, 109, 0.1);
+      border: 1px solid rgba(255, 42, 109, 0.35);
+      color: #ff94b4;
+    }
+    .alert-success {
+      background: rgba(5, 255, 161, 0.1);
+      border: 1px solid rgba(5, 255, 161, 0.35);
+      color: #8affd1;
+    }
+    .alert-info {
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      color: #99f7ff;
+    }
+    .alert-warning {
+      background: rgba(255, 184, 0, 0.1);
+      border: 1px solid rgba(255, 184, 0, 0.35);
+      color: #ffe082;
+    }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-family: var(--font-mono);
+    }
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group input[type="number"],
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--cyber-panel);
+      border: 1px solid var(--cyber-border);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      font-size: 13px;
+      font-family: var(--font-mono);
+      transition: all 0.2s ease;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px var(--neon-cyan-glow);
+      background: #192238;
+    }
+    .form-group small {
+      display: block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* High-Density Cyber Tables */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--cyber-border);
+      border-radius: var(--radius-sm);
+      background: var(--cyber-bg-subtle);
+    }
+    .cyber-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12px;
+    }
+    .cyber-table th {
+      background: #0f1422;
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--cyber-border);
+    }
+    .cyber-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(30, 40, 61, 0.5);
+      color: var(--text-sub);
+      font-family: var(--font-mono);
+    }
+    .cyber-table tr:hover td {
+      background: rgba(0, 240, 255, 0.03);
+      color: var(--text-main);
+    }
+
+    /* Cards & Containers */
+    .cyber-card {
+      background: var(--cyber-card);
+      border: 1px solid var(--cyber-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      position: relative;
+    }
+    .cyber-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 3px; height: 16px;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 8px var(--neon-cyan);
+    }
+
+    /* Japanese Branding Callout */
+    .jp-accent {
+      font-family: 'Noto Sans JP', sans-serif;
+      opacity: 0.85;
+    }
+
+    /* Full-Screen App Wrapper */
+    .fullscreen-app {
+      position: relative;
+      z-index: 1;
+      width: 100vw;
+      min-height: 100vh;
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+  {{{body}}}
+</body>
+</html>
